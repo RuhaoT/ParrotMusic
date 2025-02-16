@@ -1,0 +1,6 @@
+# all files under music/
+music/*
+music_cache/*
+
+# all files under schedule
+schedule/*
