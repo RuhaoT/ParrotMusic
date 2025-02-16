@@ -29,7 +29,6 @@ def roulette(names, possibilities):
 
 # 模拟的音频调度器函数
 def music_scheduler():
-    # 假设每个小时调用一次，返回一个播放时间范围和音频文件
     current_time = time.localtime(time.time())
     play = False
     # # 在这个例子中，我们假设每到10:00到11:00之间播放某个音频
@@ -42,32 +41,42 @@ def music_scheduler():
     #     print(f"Scheduled {audio_file} for playback between {play_start_time}:00 and {play_end_time}:00.")
     
     #debug
-    if True:  # 例如，10:00-11:00播放某个音频
-        play = True
-        audio_file = 'AnotherStory.mp3'
-        file_path = os.path.join(AUDIO_DIRECTORY, audio_file)
-        volume = 1.0
-        print(f"Scheduled {audio_file} for playback.")
+    # if True:  # 例如，10:00-11:00播放某个音频
+    #     play = True
+    #     audio_file = 'AnotherStory.mp3'
+    #     file_path = os.path.join(AUDIO_DIRECTORY, audio_file)
+    #     volume = 1.0
+    #     print(f"Scheduled {audio_file} for playback.")
         
-        return play, audio_file, file_path, volume
+    #     return play, audio_file, file_path, volume
     
     # step 1. read schedule/schedule.csv
     # schedule format: music_name, start_time, end_time, play_possibility, volume_mean, volume_std
-    schedule = pd.read_csv('schedule/schedule.csv')
+    # use first row as column names
+    schedule = pd.read_csv('schedule/schedule.csv', header=0)
+    schedule.columns = schedule.columns.str.strip()  # Remove any leading/trailing whitespace from column names
+    print(schedule)
     # step 2: obtain current time
     current_time = time.localtime(time.time())
     # step 3: select all music that can be played at current time--current_time within start_time and end_time
-    current_schedule = schedule[(schedule['start_time'] <= current_time.tm_hour) & (schedule['end_time'] > current_time.tm_hour)]
+    name_array = []
+    possibility_array = []
+    index_array = []
+    for index, row in schedule.iterrows():
+        if current_time.tm_hour >= row['start_time'] and current_time.tm_hour < row['end_time']:
+            name_array.append(row['music_name'])
+            possibility_array.append(row['play_possibility'])
+            index_array.append(index)
     # check if current_schedule is empty
-    if current_schedule.empty:
+    if len(name_array) == 0:
+        print(f"No music scheduled at {current_time.tm_hour}:00.")
         return False, None, None, None
     # step 4: select one music from current_schedule, based on play_possibility
-    name_array = current_schedule['music_name'].values
-    possibility_array = current_schedule['play_possibility'].values
     selected_name = roulette(name_array, possibility_array)
     # step 5: select volume from uniform distribution
-    selected_volume = random.uniform(current_schedule['volume_mean'], current_schedule['volume_std'])
+    selected_volume = random.uniform(schedule.loc[index_array[0], 'volume_mean'] - schedule.loc[index_array[0], 'volume_std'], schedule.loc[index_array[0], 'volume_mean'] + schedule.loc[index_array[0], 'volume_std'])
     # step 6: return selected music name and volume
+    print(f"Scheduled {selected_name} for playback, volume {selected_volume}.")
     return True, selected_name, os.path.join(AUDIO_DIRECTORY, selected_name), selected_volume
     
 
