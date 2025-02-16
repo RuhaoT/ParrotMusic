@@ -19,7 +19,7 @@ pygame.mixer.init()
 
 def handshake():
     try:
-        response = requests.get(f"{SERVER_IP}/handshake/{CLIENT_ID}", timeout=15)
+        response = requests.get(f"{SERVER_IP}/handshake/{CLIENT_ID}", timeout=15,verify=False)
         return response.json()
     except requests.exceptions.RequestException as e:
         print(f"Handshake failed: {e}")
