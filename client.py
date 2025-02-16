@@ -3,11 +3,16 @@ import time
 import pygame
 import os
 
-SERVER_IP = 'http://localhost:6324'
+# load server_info.json
+import json
+with open('server_info.json', 'r', encoding="utf-8") as f:
+    server_info = json.load(f)
+    SERVER_IP = server_info['server_ip']
+    HANDSHAKE_INTERVAL = server_info['handshake_interval']
+    RETRY_INTERVAL = server_info['retry_interval']
+    LOCAL_AUDIO_DIR = server_info['local_audio_dir']
+
 CLIENT_ID = 'client1'
-HANDSHAKE_INTERVAL = 300  # 握手间隔时间，单位秒
-RETRY_INTERVAL = 15  # 重试间隔时间，单位秒
-LOCAL_AUDIO_DIR = './music_cache'
 
 # 初始化pygame
 pygame.mixer.init()

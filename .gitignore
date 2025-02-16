@@ -4,3 +4,6 @@ music_cache/*
 
 # all files under schedule
 schedule/*
+
+# server info
+server_info.json
