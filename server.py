@@ -85,7 +85,7 @@ def music_scheduler():
     # step 5: select volume from uniform distribution
     selected_volume = random.uniform(schedule.loc[index_array[0], 'volume_mean'] - schedule.loc[index_array[0], 'volume_std'], schedule.loc[index_array[0], 'volume_mean'] + schedule.loc[index_array[0], 'volume_std'])
     # step 6: return selected music name and volume
-    if selected_name is "NONE":
+    if selected_name == "NONE":
         print(f"No music scheduled at {current_time.tm_hour}:{current_time.tm_min}.")
         return False, None, None, None
     print(f"Scheduled {selected_name} for playback, volume {selected_volume}.")
