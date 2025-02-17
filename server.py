@@ -78,13 +78,16 @@ def music_scheduler():
             index_array.append(index)
     # check if current_schedule is empty
     if len(name_array) == 0:
-        print(f"No music scheduled at {current_time.tm_hour}:00.")
+        print(f"No music scheduled at {current_time.tm_hour}:{current_time.tm_min}.")
         return False, None, None, None
     # step 4: select one music from current_schedule, based on play_possibility
     selected_name = roulette(name_array, possibility_array)
     # step 5: select volume from uniform distribution
     selected_volume = random.uniform(schedule.loc[index_array[0], 'volume_mean'] - schedule.loc[index_array[0], 'volume_std'], schedule.loc[index_array[0], 'volume_mean'] + schedule.loc[index_array[0], 'volume_std'])
     # step 6: return selected music name and volume
+    if selected_name is "NONE":
+        print(f"No music scheduled at {current_time.tm_hour}:{current_time.tm_min}.")
+        return False, None, None, None
     print(f"Scheduled {selected_name} for playback, volume {selected_volume}.")
     return True, selected_name, os.path.join(AUDIO_DIRECTORY, selected_name), selected_volume
     
