@@ -14,8 +14,7 @@ with open('server_info.json', 'r', encoding="utf-8") as f:
     HANDSHAKE_INTERVAL = server_info['handshake_interval']
     RETRY_INTERVAL = server_info['retry_interval']
     LOCAL_AUDIO_DIR = server_info['local_audio_dir']
-
-CLIENT_ID = 'client1'
+    CLIENT_ID = server_info['client_id']
 
 # 初始化pygame
 pygame.mixer.init()
