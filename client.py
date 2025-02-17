@@ -1,10 +1,13 @@
-import requests
-import time
-import pygame
-import os
-
 # load server_info.json
 import json
+import os
+import sys
+import time
+
+import pygame
+import requests
+import tinytag
+
 with open('server_info.json', 'r', encoding="utf-8") as f:
     server_info = json.load(f)
     SERVER_IP = server_info['server_ip']
@@ -43,31 +46,35 @@ def download_audio(file_path, audio_file):
 def play_audio(audio_file, volume):
     local_path = os.path.join(LOCAL_AUDIO_DIR, audio_file)
     if os.path.exists(local_path):
+        # obtain audio duration
+        audio = tinytag.TinyTag.get(local_path)
+        audio_duration_pad = audio.duration + 3
+        print(f"Audio duration: {audio.duration} seconds.")
         print(f"Playing {audio_file}...")
         pygame.mixer.music.set_volume(volume)
         pygame.mixer.music.load(local_path)
         pygame.mixer.music.play()
         # wait for playback to finish
-        while pygame.mixer.music.get_busy():
-            time.sleep(1)
+        time.sleep(audio_duration_pad)
         print(f"Finished playing {audio_file}.")
     else:
         print(f"Audio file {audio_file} not found locally.")
 
 def main():
-    while True:
-        status = handshake()
-        if status and status['status'] == 'ready':
-            print(status['message'])
-            download_audio(status['file_path'], status['file_path'].split('/')[-1])
-            play_audio(status['file_path'].split('/')[-1], status['volume'])
-            continue
-        elif status and status['status'] == 'waiting':
-            print(status['message'])
-            time.sleep(HANDSHAKE_INTERVAL)
-        else:
-            print(status['message'] if status else "Error during handshake.")
-            time.sleep(RETRY_INTERVAL)
+    status = handshake()
+    if status and status['status'] == 'ready':
+        print(status['message'])
+        download_audio(status['file_path'], status['file_path'].split('/')[-1])
+        play_audio(status['file_path'].split('/')[-1], status['volume'])
+    elif status and status['status'] == 'waiting':
+        print(status['message'])
+        time.sleep(HANDSHAKE_INTERVAL)
+    else:
+        print(status['message'] if status else "Error during handshake.")
+        time.sleep(RETRY_INTERVAL)
+        
+    # to prevent memory leak, restart the client
+    os.execv(sys.executable, ['python'] + sys.argv)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 import time
+import datetime
 import queue
 import os
 import pandas as pd
@@ -50,10 +51,17 @@ def music_scheduler():
         
     #     return play, audio_file, file_path, volume
     
-    # step 1. read schedule/schedule.csv
+    # step 1. read schedule/schedule*.csv
+    # find all file name start with schedule
+    schedule_files = [f for f in os.listdir('schedule') if os.path.isfile(os.path.join('schedule', f)) and f.startswith('schedule')]
+    # select schedule file based on current weekday
+    curr_weekday_index = current_time.tm_wday
+    len_schedule_files = len(schedule_files)
+    schedule_file = schedule_files[curr_weekday_index % len_schedule_files]
+    
     # schedule format: music_name, start_time, end_time, play_possibility, volume_mean, volume_std
     # use first row as column names
-    schedule = pd.read_csv('schedule/schedule.csv', header=0)
+    schedule = pd.read_csv(f"schedule/{schedule_file}", header=0)
     schedule.columns = schedule.columns.str.strip()  # Remove any leading/trailing whitespace from column names
     print(schedule)
     # step 2: obtain current time
