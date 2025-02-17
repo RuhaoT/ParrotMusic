@@ -56,6 +56,7 @@ def music_scheduler():
     schedule_files = [f for f in os.listdir('schedule') if os.path.isfile(os.path.join('schedule', f)) and f.startswith('schedule')]
     # select schedule file based on current weekday
     curr_weekday_index = current_time.tm_wday
+    print(f"Current weekday index: {curr_weekday_index}")
     len_schedule_files = len(schedule_files)
     schedule_file = schedule_files[curr_weekday_index % len_schedule_files]
     
